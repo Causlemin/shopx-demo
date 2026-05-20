@@ -749,6 +749,19 @@ Benefits:
 - MongoDB Atlas or local MongoDB
 - RabbitMQ
 
+## Environment Variables
+
+Create a '.env' file in the project root:
+
+AUTH_MONGO_CONNECTION_STRING=mongodb+srv://...
+PRODUCT_MONGO_CONNECTION_STRING=mongodb+srv://...
+ORDER_MONGO_CONNECTION_STRING=mongodb+srv://...
+LOG_MONGO_CONNECTION_STRING=mongodb+srv://...
+
+JWT_SECRET=your-super-secret-key-at-least-32-characters-long-for-all-services
+
+Note: 'appsettings.json' files contain placeholder values only. Actual configuration values are injected through environment variables.
+
 ## Backend Startup
 
 Run each service in a separate terminal:
