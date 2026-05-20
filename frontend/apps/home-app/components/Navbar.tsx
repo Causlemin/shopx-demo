@@ -1,25 +1,15 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { Button } from '@repo/ui';
-import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
-import { subscribeCartSync } from "@repo/event-bus";
-import { ShoppingCart, User, Package, LayoutDashboard, LogOut, LogIn, ShoppingBagIcon, HomeIcon, MenuIcon } from 'lucide-react';
-import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { useCartStore } from '@/store/cartStore';
 import { authApi } from '@repo/api-client';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@repo/ui"
+import { subscribeCartSync } from "@repo/event-bus";
+import { Button } from '@repo/ui';
+import { HomeIcon, LayoutDashboard, LogIn, LogOut, Package, ShoppingBagIcon, User } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import MenuMd from './MenuMd';
 import NavbarCart from './NavbarCart';
 
@@ -88,9 +78,12 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold">
-          ShopX
-        </Link>
+        <span className="flex items-center gap-2">
+          <ShoppingBagIcon />
+          <Link href="/" className="text-xl font-bold">
+            ShopX
+          </Link>
+        </span>
 
         <div className="hidden md:flex items-center gap-4">
           <Button variant={isActive('/') ? 'default' : 'ghost'}
@@ -126,10 +119,10 @@ export function Navbar() {
         </div>
 
         <div className='flex items-center gap-4 pr-4'>
-          <NavbarCart items={items}/>
+          <NavbarCart items={items} />
 
           <Button variant="ghost" size="sm" onClick={handleLogout}
-          className='hidden md:flex'
+            className='hidden md:flex'
           >
             <LogOut className="mr-1 h-4 w-4" /> Çıkış
           </Button>

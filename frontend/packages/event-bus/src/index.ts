@@ -2,7 +2,7 @@ import * as signalR from "@microsoft/signalr";
 import type { CartItem } from "@repo/types";
 
 const API_GATEWAY_URL =
-  process.env.NEXT_PUBLIC_API_GATEWAY_URL ?? "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL ?? "http://localhost:5050";
 
 const CART_HUB_URL = `${API_GATEWAY_URL}/hubs/cart`;
 

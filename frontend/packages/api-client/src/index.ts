@@ -2,21 +2,19 @@ import axios from 'axios';
 import * as z from 'zod';
 import {
     loginRequestSchema,
-    registerRequestSchema,
-    refreshTokenRequestSchema,
     loginResponseSchema,
-    registerResponseSchema,
     refreshTokenResponseSchema,
+    registerRequestSchema,
+    registerResponseSchema
 } from "./validations/auth";
 import {
-    createProductSchema,
-    updateProductSchema,
-    updateStockSchema,
     productIdSchema,
+    updateProductSchema,
+    updateStockSchema
 } from './validations/product';
-import { createOrderSchema } from './validations/order';
 
-const API_GATEWAY_URL = 'http://localhost:5000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:5050';
 
 export const api = axios.create({
     baseURL: API_GATEWAY_URL,

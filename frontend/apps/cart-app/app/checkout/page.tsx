@@ -1,27 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useCartStore } from '@/store/cartStore';
-import { cartApi, orderApi } from '@repo/api-client';
-import { Button } from '@repo/ui';
-import { Input } from '@repo/ui';
-import { Label } from '@repo/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui';
-import { toast } from 'sonner';
-import { Loader2, CreditCard, Lock, PhoneIcon, PinIcon } from 'lucide-react';
-import { checkoutSchema, CheckoutFormData } from '@repo/api-client/validations';
-import { useAuthStore } from '@/store/authStore';
-import { emitCartSync, emitOrderCompleted } from '@repo/event-bus';
 import { formatCurrency } from '@/constants';
+import { useAuthStore } from '@/store/authStore';
+import { useCartStore } from '@/store/cartStore';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { cartApi, orderApi } from '@repo/api-client';
+import { CheckoutFormData, checkoutSchema } from '@repo/api-client/validations';
+import { emitCartSync } from '@repo/event-bus';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@repo/ui';
+import { CreditCard, Loader2, Lock, PhoneIcon, PinIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function CheckoutPage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const { items, getTotalPrice } = useCartStore();
+  const { items, getTotalPrice, clearCart } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const totalPrice = getTotalPrice();
@@ -135,11 +135,9 @@ export default function CheckoutPage() {
           description: `Sipariş takip numaranız: ${result.trackingNumber || result.orderNumber}`,
         });
 
-        await Promise.all([
-          cartApi.clear(),
-          emitCartSync([]),
-          emitOrderCompleted(),
-        ]);
+        clearCart();
+        await cartApi.clear();
+        await emitCartSync([]);
         router.replace(`/order-confirmation?orderId=${result.orderId}`);
       } else {
         throw new Error('Sipariş oluşturulamadı');

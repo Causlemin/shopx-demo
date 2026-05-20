@@ -5,12 +5,19 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using ApiGateway.Hubs;
 using Yarp.ReverseProxy.Transforms;
+using MassTransit;
+using ApiGateway.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Serilog Configuration
+var logsConnectionString =
+    builder.Configuration["LogsDB:ConnectionString"] ??
+    throw new InvalidOperationException("LogsDB connection string is missing");
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
+    .WriteTo.MongoDB(logsConnectionString, collectionName: "Logs")
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -20,6 +27,29 @@ builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<OrderCompletedEventConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitMqHost = builder.Configuration["RabbitMQ:HostName"] ?? "localhost";
+        var rabbitMqUserName = builder.Configuration["RabbitMQ:UserName"] ?? "guest";
+        var rabbitMqPassword = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+
+        cfg.Host(rabbitMqHost, "/", h =>
+        {
+            h.Username(rabbitMqUserName);
+            h.Password(rabbitMqPassword);
+        });
+
+        cfg.ReceiveEndpoint("api-gateway-queue", e =>
+        {
+            e.ConfigureConsumer<OrderCompletedEventConsumer>(context);
+        });
+    });
+});
 
 // CORS Configuration
 builder.Services.AddCors(options =>

@@ -30,6 +30,7 @@ services:
       ASPNETCORE_URLS: http://+:5001
       MongoDB__ConnectionString: ${AUTH_MONGO_CONNECTION_STRING}
       MongoDB__DatabaseName: AuthDB
+      LogsDB__ConnectionString: ${LOG_MONGO_CONNECTION_STRING}
       Jwt__Secret: ${JWT_SECRET}
       Jwt__Issuer: auth-service
       Jwt__Audience: api-gateway
@@ -55,6 +56,7 @@ services:
       ASPNETCORE_URLS: http://+:5002
       MongoDB__ConnectionString: ${PRODUCT_MONGO_CONNECTION_STRING}
       MongoDB__DatabaseName: ProductsDB
+      LogsDB__ConnectionString: ${LOG_MONGO_CONNECTION_STRING}
       Jwt__Secret: ${JWT_SECRET}
       Jwt__Issuer: auth-service
       Jwt__Audience: api-gateway
@@ -80,6 +82,7 @@ services:
       ASPNETCORE_URLS: http://+:5004
       MongoDB__ConnectionString: ${ORDER_MONGO_CONNECTION_STRING}
       MongoDB__DatabaseName: OrdersDB
+      LogsDB__ConnectionString: ${LOG_MONGO_CONNECTION_STRING}
       Jwt__Secret: ${JWT_SECRET}
       Jwt__Issuer: auth-service
       Jwt__Audience: api-gateway
@@ -124,14 +127,18 @@ services:
       dockerfile: Dockerfile
     container_name: api-gateway
     ports:
-      - "5000:5000"
+      - "5050:5000"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5000
       Jwt__Secret: ${JWT_SECRET}
       Jwt__Issuer: auth-service
       Jwt__Audience: api-gateway
-
+      LogsDB__ConnectionString: ${LOG_MONGO_CONNECTION_STRING}
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__UserName: guest
+      RabbitMQ__Password: guest
       ReverseProxy__Clusters__auth-cluster__Destinations__auth-destination__Address: http://auth-service:5001
       ReverseProxy__Clusters__product-cluster__Destinations__product-destination__Address: http://product-service:5002
       ReverseProxy__Clusters__log-cluster__Destinations__log-destination__Address: http://log-service:5003
@@ -152,7 +159,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5000
+      NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5050
     depends_on:
       - api-gateway
     networks:
@@ -166,7 +173,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5000
+      NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5050
     depends_on:
       - api-gateway
     networks:

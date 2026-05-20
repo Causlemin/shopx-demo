@@ -20,6 +20,14 @@ namespace Application.Consumers
             // Stok başarılı → siparişi "Confirmed" yap
             await _orderStatusRepository.UpdateStatusAsync(context.Message.OrderId, "Confirmed", context.CancellationToken);
             
+            await _publishEndpoint.Publish(new OrderCompletedEvent
+            {
+                OrderId = context.Message.OrderId,
+                OrderNumber = context.Message.OrderNumber,
+                CorrelationId = context.Message.CorrelationId,
+                OccurredAt = DateTime.UtcNow
+            }, context.CancellationToken);
+            
             // Ödeme işlemini tetikle (fake - her zaman başarılı)
             await _publishEndpoint.Publish(new PaymentCompletedEvent
             {

@@ -1,20 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useAuthStore } from '@/store/authStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authApi } from "@repo/api-client";
-import { useAuthStore } from '@/store/authStore';
-import { Button } from "@repo/ui";
-import { Input } from "@repo/ui";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@repo/ui";
-import { Label } from '@repo/ui';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui";
 import { LoginFormData, loginSchema, RegisterFormData, registerSchema } from '@repo/api-client/validations';
+import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
+import { Eye, EyeOff, Loader2, ShoppingBagIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -94,11 +89,14 @@ export default function LoginPage() {
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 p-4 dark:from-slate-950 dark:to-slate-900">
             <Card className="w-full max-w-md shadow-xl">
                 <CardHeader className="space-y-1 text-center">
-                    <CardTitle className="text-3xl font-bold">🛍️ ShopX</CardTitle>
+                    <CardTitle className="text-3xl font-bold flex items-center gap-2">
+                        <ShoppingBagIcon />    
+                        ShopX
+                    </CardTitle>
                     <CardDescription>Alışverişe başlamak için giriş yap veya hesap oluştur</CardDescription>
                 </CardHeader>
 
-                <Tabs defaultValue="login" className="w-full">
+                <Tabs defaultValue="login" className="w-full flex flex-col">
                     <TabsList className="mx-6 grid w-auto grid-cols-2">
                         <TabsTrigger value="login" data-value="login">Giriş Yap</TabsTrigger>
                         <TabsTrigger value="register" data-value="register">Kayıt Ol</TabsTrigger>
