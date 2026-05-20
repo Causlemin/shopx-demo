@@ -1,0 +1,28 @@
+# Node
+node_modules
+.pnpm-store
+.next
+dist
+build
+
+# Env
+.env
+.env.local
+.env.*
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+
+# .NET
+bin
+obj
+
+# Docker
+docker-data
+
+# Turbo
+.turbo

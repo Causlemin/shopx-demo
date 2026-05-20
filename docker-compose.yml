@@ -1,0 +1,177 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: ./backend/AuthService
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5001
+      MongoDB__ConnectionString: ${AUTH_MONGO_CONNECTION_STRING}
+      MongoDB__DatabaseName: AuthDB
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: api-gateway
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__UserName: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  product-service:
+    build:
+      context: ./backend/ProductService
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "5002:5002"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5002
+      MongoDB__ConnectionString: ${PRODUCT_MONGO_CONNECTION_STRING}
+      MongoDB__DatabaseName: ProductsDB
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: api-gateway
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__UserName: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  order-service:
+    build:
+      context: ./backend/OrderService
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "5004:5004"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5004
+      MongoDB__ConnectionString: ${ORDER_MONGO_CONNECTION_STRING}
+      MongoDB__DatabaseName: OrdersDB
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: api-gateway
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__UserName: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  log-service:
+    build:
+      context: ./backend/LogService
+      dockerfile: Dockerfile
+    container_name: log-service
+    ports:
+      - "5003:5003"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5003
+      MongoDB__ConnectionString: ${LOG_MONGO_CONNECTION_STRING}
+      MongoDB__DatabaseName: LogsDB
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: api-gateway
+      RabbitMQ__HostName: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__UserName: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build:
+      context: ./backend/ApiGateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: auth-service
+      Jwt__Audience: api-gateway
+
+      ReverseProxy__Clusters__auth-cluster__Destinations__auth-destination__Address: http://auth-service:5001
+      ReverseProxy__Clusters__product-cluster__Destinations__product-destination__Address: http://product-service:5002
+      ReverseProxy__Clusters__log-cluster__Destinations__log-destination__Address: http://log-service:5003
+      ReverseProxy__Clusters__order-cluster__Destinations__order-destination__Address: http://order-service:5004
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - log-service
+    networks:
+      - microservices-network
+
+  home-app:
+    build:
+      context: ./frontend
+      dockerfile: apps/home-app/Dockerfile
+    container_name: home-app
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5000
+    depends_on:
+      - api-gateway
+    networks:
+      - microservices-network
+
+  cart-app:
+    build:
+      context: ./frontend
+      dockerfile: apps/cart-app/Dockerfile
+    container_name: cart-app
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5000
+    depends_on:
+      - api-gateway
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
