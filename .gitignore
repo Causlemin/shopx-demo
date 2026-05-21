@@ -26,3 +26,6 @@ docker-data
 
 # Turbo
 .turbo
+
+# Local development secrets
+**/appsettings.Development.json
