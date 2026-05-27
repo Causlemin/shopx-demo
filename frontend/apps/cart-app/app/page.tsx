@@ -7,7 +7,7 @@ import { Button } from '@repo/ui';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui';
 import { useRouter } from 'next/navigation';
 import { subscribeCartAdd, subscribeCartSync, emitCartSync } from "@repo/event-bus";
-import { formatCurrency } from '@/constants';
+import { cartPath, formatCurrency } from '@/constants';
 import { cartApi } from '@repo/api-client';
 import { ChevronLeftIcon, ShoppingCartIcon } from 'lucide-react';
 
@@ -104,7 +104,7 @@ export default function Home() {
           <CardFooter>
             <Button
               className="w-full"
-              onClick={() => push('/checkout')}
+              onClick={() => push(cartPath('/checkout'))}
             >
               Siparişi Tamamla (₺{formatCurrency(getTotalPrice())})
             </Button>

@@ -68,7 +68,7 @@ function OrderConfirmationContent() {
         <p className="mt-2 text-muted-foreground">
           Geçersiz sipariş numarası.
         </p>
-        <Button className="mt-4" onClick={() => push('/')}>
+        <Button className="mt-4" onClick={() => push('http://localhost:3000')}>
           Ana Sayfaya Dön
         </Button>
       </div>

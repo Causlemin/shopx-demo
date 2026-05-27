@@ -155,11 +155,15 @@ services:
     build:
       context: ./frontend
       dockerfile: apps/home-app/Dockerfile
+      args:
+        NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5050
+        CART_ZONE_URL: http://cart-app:3001
     container_name: home-app
     ports:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5050
+      CART_ZONE_URL: http://cart-app:3001
     depends_on:
       - api-gateway
     networks:
@@ -169,11 +173,15 @@ services:
     build:
       context: ./frontend
       dockerfile: apps/cart-app/Dockerfile
+      args:
+        NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5050
+        NEXT_PUBLIC_CART_ASSET_PREFIX: /cart-assets
     container_name: cart-app
     ports:
       - "3001:3001"
     environment:
       NEXT_PUBLIC_API_GATEWAY_URL: http://localhost:5050
+      NEXT_PUBLIC_CART_ASSET_PREFIX: /cart-assets
     depends_on:
       - api-gateway
     networks:

@@ -69,8 +69,7 @@ const NavbarCart = ({
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup asChild className="mt-3">
                     <a
-                        href="http://localhost:3001"
-                        target="_blank"
+                        href="/cart"
                         className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                         onClick={() => setOpen(false)}
                     >

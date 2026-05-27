@@ -1,6 +1,6 @@
 'use client';
 
-import { formatCurrency } from '@/constants';
+import { cartPath, formatCurrency } from '@/constants';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,9 +13,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-
-const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -77,7 +74,7 @@ export default function CheckoutPage() {
       toast.error('Sepet Boş', {
         description: 'Sepetinizde ürün bulunmamaktadır.',
       });
-      router.push('/');
+      router.push('http://localhost:3000');
       return;
     }
 
@@ -138,7 +135,7 @@ export default function CheckoutPage() {
         clearCart();
         await cartApi.clear();
         await emitCartSync([]);
-        router.replace(`/order-confirmation?orderId=${result.orderId}`);
+        router.replace(cartPath(`/order-confirmation?orderId=${result.orderId}`));
       } else {
         throw new Error('Sipariş oluşturulamadı');
       }

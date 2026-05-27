@@ -7,4 +7,16 @@ export function formatCurrency(amount: any) {
     ?.replace?.(/\./g, "#")
     .replace(/,/g, ".")
     ?.replace?.(/#/g, ",");
+};
+
+// packages/utils/routes.ts
+export function cartPath(path: string) {
+  if (
+    typeof window !== "undefined" &&
+    window.location.pathname.startsWith("/cart")
+  ) {
+    return `/cart${path}`;
+  }
+
+  return path;
 }

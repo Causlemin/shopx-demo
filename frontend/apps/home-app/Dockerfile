@@ -17,6 +17,13 @@ COPY packages/api-client/package.json ./packages/api-client/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
+
+ARG NEXT_PUBLIC_API_GATEWAY_URL
+ARG CART_ZONE_URL
+
+ENV NEXT_PUBLIC_API_GATEWAY_URL=$NEXT_PUBLIC_API_GATEWAY_URL
+ENV CART_ZONE_URL=$CART_ZONE_URL
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/home-app/node_modules ./apps/home-app/node_modules
 COPY --from=deps /app/packages ./packages
@@ -29,6 +36,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
+
+ARG NEXT_PUBLIC_API_GATEWAY_URL
+ARG CART_ZONE_URL
+
+ENV NEXT_PUBLIC_API_GATEWAY_URL=$NEXT_PUBLIC_API_GATEWAY_URL
+ENV CART_ZONE_URL=$CART_ZONE_URL
 
 COPY --from=builder /app/apps/home-app/.next ./apps/home-app/.next
 COPY --from=builder /app/apps/home-app/public ./apps/home-app/public
